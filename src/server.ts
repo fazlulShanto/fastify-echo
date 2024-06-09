@@ -1,6 +1,6 @@
 // imports
 import dotenv from "dotenv";
-import Fastify, { FastifyRequest } from "fastify";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import { cacheDB } from "./utils";
 dotenv.config();
@@ -21,7 +21,7 @@ fastify.register(cors, {
 
 // Declare a route
 
-fastify.get("/", function (request, reply) {
+fastify.get("/", function (request:TFR, reply:FastifyReply) {
     reply.send({
         message: "ok",
         availableRoutes: [
@@ -33,7 +33,7 @@ fastify.get("/", function (request, reply) {
     });
 });
 
-fastify.get("/health-check", function (request, reply) {
+fastify.get("/health-check", function (request: TFR, reply:FastifyReply) {
     reply.send({
         message: "ok",
         version: "1.0.0",
@@ -41,7 +41,7 @@ fastify.get("/health-check", function (request, reply) {
     });
 });
 
-fastify.delete("/cache/:id", function (request: TFR, reply) {
+fastify.delete("/cache/:id", function (request: TFR, reply:FastifyReply) {
     const data = store.get(request.params.id);
     if (data) {
         store.delete(request.params.id);
@@ -50,7 +50,7 @@ fastify.delete("/cache/:id", function (request: TFR, reply) {
     reply.status(404).send({ message: `No data exist with id ${request.params.id}.` });
 });
 
-fastify.get("/cache/:id", function (request: TFR, reply) {
+fastify.get("/cache/:id", function (request: TFR, reply:FastifyReply) {
     const itemId = request.params.id;
     const data = store.get((itemId));
     if (data ) {
@@ -59,7 +59,7 @@ fastify.get("/cache/:id", function (request: TFR, reply) {
     reply.status(404).send({ message: `No data exist with id ${itemId}.` });
 });
 
-fastify.put("/cache/:id", function (request: TFR, reply) {
+fastify.put("/cache/:id", function (request: TFR, reply:FastifyReply) {
     const doesExist = store.has(request.params.id);
     if (doesExist) {
         const old = store.get(request.params.id)
@@ -69,7 +69,7 @@ fastify.put("/cache/:id", function (request: TFR, reply) {
      reply.status(404).send({ message: `No data exist with id ${request.params.id}.` });
 });
 
-fastify.post("/cache", function (request, reply) {
+fastify.post("/cache", function (request:TFR, reply:FastifyReply) {
     const ttl = request.headers.ttl;
     if(ttl && Number(ttl) > 1){
         const itemId = store.setWithCustomTTL(request.body, Number(ttl));
@@ -80,7 +80,7 @@ fastify.post("/cache", function (request, reply) {
     }
 });
 
-fastify.get("/entries", (req, reply) => {
+fastify.get("/entries", (req:TFR, reply:FastifyReply) => {
     reply.send(store.entries());
 });
 
